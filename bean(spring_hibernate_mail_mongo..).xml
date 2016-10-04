@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:beans="http://www.springframework.org/schema/beans"
+             xmlns:context="http://www.springframework.org/schema/context"
+             xmlns:tx="http://www.springframework.org/schema/tx"
+             xmlns:task="http://www.springframework.org/schema/task"
+             xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+             xmlns:p="http://www.springframework.org/schema/p"
+             xsi:schemaLocation="
+         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.1.xsd
+            http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+            http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.1.xsd
+            http://www.springframework.org/schema/data/mongo http://www.springframework.org/schema/data/mongo/spring-mongo-1.7.xsd">
+
+    <context:component-scan base-package="dao,service,task" use-default-filters="true"/>
+    /*加载自定义配置文件*/
+    <beans:bean id="property"
+                class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <beans:property name="locations">
+            <beans:list>
+                <beans:value>classpath:mongo.properties</beans:value>
+                <beans:value>classpath:jdbc.properties</beans:value>
+                <beans:value>classpath:mail.properties</beans:value>
+                <beans:value>classpath:redis.properties</beans:value>
+            </beans:list>
+        </beans:property>
+    </beans:bean>
+    /*配置redis模板*/
+    <beans:bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+        <beans:property name="maxTotal" value="${redis.pool.maxTotal}"/>
+        <beans:property name="maxIdle" value="${redis.pool.maxIdle}"/>
+        <beans:property name="maxWaitMillis" value="${redis.pool.maxWaitMillis}"/>
+        <beans:property name="testOnBorrow" value="${redis.pool.testOnBorrow}"/>
+    </beans:bean>
+
+    <beans:bean id="connectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory"
+                p:hostName="${redis.hostname}"
+                p:port="${redis.port}"
+                p:password="${redis.pass}"
+                p:poolConfig-ref="jedisPoolConfig"/>
+
+    <beans:bean id="redisTemplate" class="org.springframework.data.redis.core.StringRedisTemplate">
+        <beans:property name="connectionFactory" ref="connectionFactory"/>
+    </beans:bean>
+
+  /*连接mongodb数据库*/
+    <mongo:mongo host="${mongo.url}" port="${mongo.port}" id="mongo">
+
+    </mongo:mongo>
+
+    <!-- Offers convenience methods and automatic mapping between MongoDB JSON
+        documents and your domain classes. -->
+    <beans:bean id="mongoTemplate"
+                class="org.springframework.data.mongodb.core.MongoTemplate">
+        <beans:constructor-arg ref="mongo"/>
+        <beans:constructor-arg name="databaseName"
+                               value="${mongo.db}"/>
+    </beans:bean>
+
+    /*邮件发送设置*/
+    <beans:bean name="reportNfSender"
+                class="org.springframework.mail.javamail.JavaMailSenderImpl">
+        <beans:property name="host" value="${mail.host}"/>
+        <beans:property name="port" value="${mail.port}"/>
+        <beans:property name="protocol" value="${mail.protocol}"/>
+        <beans:property name="defaultEncoding" value="${mail.defaultEncoding}"/>
+        <beans:property name="username" value="${mail.username}"/>
+        <beans:property name="password" value="${mail.password}"/>
+    </beans:bean>
+
+    <beans:bean name="sysaccountNfSender"
+                class="org.springframework.mail.javamail.JavaMailSenderImpl">
+        <beans:property name="host" value="${sysaccount.notification.host}"/>
+        <beans:property name="port" value="${sysaccount.notification.port}"/>
+        <beans:property name="protocol" value="${sysaccount.notification.protocol}"/>
+        <beans:property name="defaultEncoding" value="${mail.defaultEncoding}"/>
+        <beans:property name="username" value="${sysaccount.notification.username}"/>
+        <beans:property name="password" value="${sysaccount.notification.password}"/>
+    </beans:bean>
+
+    <beans:bean name="datasourceNfSender1"
+                class="org.springframework.mail.javamail.JavaMailSenderImpl">
+        <beans:property name="host" value="${datasource.notification1.host}"/>
+        <beans:property name="port" value="${datasource.notification1.port}"/>
+        <beans:property name="protocol" value="${datasource.notification1.protocol}"/>
+        <beans:property name="defaultEncoding" value="${mail.defaultEncoding}"/>
+        <beans:property name="username" value="${datasource.notification1.username}"/>
+        <beans:property name="password" value="${datasource.notification1.password}"/>
+    </beans:bean>
+
+    <beans:bean name="datasourceNfSender2"
+                class="org.springframework.mail.javamail.JavaMailSenderImpl">
+        <beans:property name="host" value="${datasource.notification2.host}"/>
+        <beans:property name="port" value="${datasource.notification2.port}"/>
+        <beans:property name="protocol" value="${datasource.notification2.protocol}"/>
+        <beans:property name="defaultEncoding" value="${mail.defaultEncoding}"/>
+        <beans:property name="username" value="${datasource.notification2.username}"/>
+        <beans:property name="password" value="${datasource.notification2.password}"/>
+    </beans:bean>
+
+    <beans:bean name="datasourceNfSender3"
+                class="org.springframework.mail.javamail.JavaMailSenderImpl">
+        <beans:property name="host" value="${datasource.notification3.host}"/>
+        <beans:property name="port" value="${datasource.notification3.port}"/>
+        <beans:property name="protocol" value="${datasource.notification3.protocol}"/>
+        <beans:property name="defaultEncoding" value="${mail.defaultEncoding}"/>
+        <beans:property name="username" value="${datasource.notification3.username}"/>
+        <beans:property name="password" value="${datasource.notification3.password}"/>
+    </beans:bean>
+
+    <beans:bean name="datasourceNfSender4"
+                class="org.springframework.mail.javamail.JavaMailSenderImpl">
+        <beans:property name="host" value="${datasource.notification4.host}"/>
+        <beans:property name="port" value="${datasource.notification4.port}"/>
+        <beans:property name="protocol" value="${datasource.notification4.protocol}"/>
+        <beans:property name="defaultEncoding" value="${mail.defaultEncoding}"/>
+        <beans:property name="username" value="${datasource.notification4.username}"/>
+        <beans:property name="password" value="${datasource.notification4.password}"/>
+    </beans:bean>
+
+/*邮件发送模板*/
+    <beans:bean id="velocityEngine"
+                class="org.springframework.ui.velocity.VelocityEngineFactoryBean">
+        <!--<beans:property name="resourceLoaderPath" value="/WEB-INF/templates/"/> -->
+        <beans:property name="velocityProperties">
+            <beans:props>
+                <!--<beans:prop key="velocimacro.library">*.vm</beans:prop> -->
+                <beans:prop key="resource.loader">class</beans:prop>
+                <beans:prop key="class.resource.loader.class">
+                    org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader
+                </beans:prop>
+                <beans:prop key="default.contentType">text/html; charset=UTF-8</beans:prop>
+                <beans:prop key="output.encoding">UTF-8</beans:prop>
+                <beans:prop key="input.encoding">UTF-8</beans:prop>
+            </beans:props>
+        </beans:property>
+    </beans:bean>
+
+/*hibernate数据库链接设置*/
+    <beans:bean id="dataSource"
+                class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <beans:property name="driverClassName" value="${jdbc.driverClassName}"/>
+        <beans:property name="url" value="${jdbc.url}"/>
+        <beans:property name="username" value="${jdbc.username}"/>
+        <beans:property name="password" value="${jdbc.password}"/>
+    </beans:bean>
+
+    <beans:bean id="sessionFactory" name="sessionFactory"
+                class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+        <beans:property name="dataSource" ref="dataSource"/>
+        <beans:property name="hibernateProperties">
+            <beans:props>
+                <beans:prop key="connection.useUnicode">true</beans:prop>
+                <beans:prop key="connection.characterEncoding">UTF-8</beans:prop>
+
+                <beans:prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect
+                </beans:prop>
+                <beans:prop key="hibernate.show_sql">${hibernate.show_sql}</beans:prop>
+                <beans:prop key="hibernate.format_sql">true</beans:prop>
+
+                <beans:prop key="hibernate.hbm2ddl.auto">update</beans:prop>
+                <beans:prop key="hibernate.connection.autocommit">false</beans:prop>
+                <beans:prop key="hibernate.transaction.manager_lookup_class">
+                    org.springframework.orm.hibernate4.SpringSessionContext
+                </beans:prop>
+            </beans:props>
+        </beans:property>
+
+        <beans:property name="packagesToScan" value="model.*"/>
+    </beans:bean>
+
+/*事物设置*/
+    <beans:bean id="transactionManager"
+                class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+        <beans:property name="sessionFactory" ref="sessionFactory"/>
+    </beans:bean>
+
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+    <beans:bean id="configProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <beans:property name="locations">
+            <beans:list>
+                <beans:value>classpath:mail.properties</beans:value>
+                <beans:value>classpath:args.properties</beans:value>
+            </beans:list>
+        </beans:property>
+    </beans:bean>
+    <beans:bean id="propertyConfigurer"
+                class="org.springframework.beans.factory.config.PreferencesPlaceholderConfigurer">
+        <beans:property name="properties" ref="configProperties"></beans:property>
+    </beans:bean>
+
+    <task:annotation-driven/>
+
+</beans:beans>
